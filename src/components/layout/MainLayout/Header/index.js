@@ -40,7 +40,7 @@ const useStyles = makeStyles((theme) => ({
 
 // ===========================|| MAIN NAVBAR / HEADER ||=========================== //
 
-const Header = ({ handleLeftDrawerToggle,return_dataProp }) => {
+const Header = ({ handleLeftDrawerToggle,return_dataProp, currentUser, nearConfig, wallet  }) => {
     const classes = useStyles();
     const return_data = (data) => {
         return_dataProp(data);
@@ -61,13 +61,13 @@ const Header = ({ handleLeftDrawerToggle,return_dataProp }) => {
             </div>
 
             {/* header search */}
-            <SearchSection return_data={return_data} theme="light" />
+            {/* <SearchSection return_data={return_data} theme="light" /> */}
             <div className={classes.grow} />
             <div className={classes.grow} />
 
             {/* notification & profile */}
             {/* <NotificationSection /> */}
-            <ProfileSection return_data={return_data} />
+            <ProfileSection return_data={return_data} currentUser={currentUser} nearConfig={nearConfig} wallet={wallet} />
         </>
     );
 };

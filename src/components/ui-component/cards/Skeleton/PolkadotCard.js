@@ -6,6 +6,7 @@ import { Avatar, Grid, Menu, MenuItem, Typography,Button  } from '@material-ui/c
 import EarningIcon from '../../../assets/images/icons/earning.svg';
 import MainCard from '../MainCard';
 import { Link } from 'react-router-dom';
+import SendIcon from '@material-ui/icons/Send';
 
 
 // style constant
@@ -90,7 +91,8 @@ const useStyles = makeStyles((theme) => ({
 
 // ===========================|| SKELETON EARNING CARD ||=========================== //
 
-const PolkadotCard = () => {
+const PolkadotCard = ({ currentUser, wallet }) => {
+    const accountId = currentUser?.accountId;
     const utilities = {
         id: 'utilities',
         title: 'Utilities',
@@ -109,30 +111,68 @@ const PolkadotCard = () => {
     const classes = useStyles();
     const handleClick = (event) => {
     };
+    const signIn = () => {
+        wallet.requestSignIn("", "");
+        }
     return (
         <MainCard border={false} className={classes.card} contentClass={classes.content} onClick={handleClick}>
 
-<Grid container direction="column">
-                        <Grid item>
-                            <Grid container justifyContent="space-between">
-                                <Grid item>
-                                    <Avatar component={Link} to="/transaction/details" color="primary" variant="rounded" className={classes.avatar}>
-                                        <img src={EarningIcon} alt="Notification" />
-                                    </Avatar>
-                                </Grid>
-                            
-                            </Grid>
-                        </Grid>
+<Grid container direction="column" alignItems="center">
+                       
+                        {accountId ?  
                         <Grid item>
                             <Grid container alignItems="center">
-                                <Grid item>
-                                    <Typography className={classes.cardHeading}>Polkadot</Typography>
+                           
+                            <Grid item>
+                                    <Typography className={classes.cardHeading}>Welcome</Typography>
                                 </Grid>
+                            </Grid>
+                        </Grid>
+                        :
+                        <Grid item>
+                        <Grid container alignItems="center">
+                            <Grid item>
+                                <Typography className={classes.cardHeading}>Please Login First</Typography>
                             </Grid>
                         </Grid>
                     </Grid>
+                        }
+                        {accountId ?  
+                        <Grid item>
+                            <Grid container alignItems="center">
+                           
+                                <Grid item>
+                                    <Typography className={classes.cardHeading}>{accountId}</Typography>
+                                </Grid>
+                            </Grid>
+                        </Grid>
+                        :
+                        <Grid item>
+                        <Grid container alignItems="center">
+                            <Grid item>
+                            <Button variant="contained" endIcon={<SendIcon />} onClick={signIn}>
+                            Login
+                            </Button>
+
+                            </Grid>
+                        </Grid>
+                    </Grid>
+                        }
+                                   {accountId &&  
+                        <Grid item>
+                            <Grid container alignItems="center">
+                           
+                                <Grid item>
+                                <Button component={Link} to="/accounts" variant="contained" endIcon={<SendIcon />} onClick={(event) => handleClick(event)}>
+                            Get Start
+                            </Button>
+                                </Grid>
+                            </Grid>
+                        </Grid>  }
+                       
+                    </Grid>
                     </MainCard>
-    );
+    )
 };
 
 export default PolkadotCard;

@@ -4,12 +4,10 @@ import React, { useState,useEffect  } from 'react';
 import { withStyles } from '@material-ui/styles';
 import Typography from '@material-ui/core/Typography';
 import SearchIcon from '@material-ui/icons/Search';
-import logo from './logo-home-page.png';
 import { makeStyles } from '@material-ui/styles';
 import { Card, CardContent, Grid,Skeleton } from '@material-ui/core';
 import PolkadotCard from './ui-component/cards/Skeleton/PolkadotCard';
 import KusamaCard from './ui-component/cards/Skeleton/KusamaCard';
-import ProfileSection from 'components/layout/MainLayout/Header/ProfileSection';
 import SearchSection from 'components/layout/MainLayout/Header/SearchSection';
 import { gridSpacing } from './store/constant';
 
@@ -28,12 +26,13 @@ const useStyles = makeStyles({
   }
 });
 
-function Dashboard(props) {
+function Dashboard({ currentUser, wallet }) {
   const classes = useStyles();
   const [allAccounts, setAllAccounts] = useState([]);
   const [error, setError] = useState(null);
   const [isLoading, setLoading] = useState(true);
     useEffect(() => {
+      
         setLoading(false);
     }, []);
 
@@ -75,21 +74,20 @@ function Dashboard(props) {
 
     <Grid container spacing={gridSpacing}>
         <Grid item xs={12}>
-        <Grid container spacing={gridSpacing}>
-            <Grid item lg={4} md={6} sm={6} xs={12}>
-            
-                <PolkadotCard  />
-            </Grid>
-            <Grid item lg={4} md={6} sm={6} xs={12}>
-                <KusamaCard />
-            </Grid>
-            {/* <Grid item lg={4} md={6} sm={6} xs={12}>
-                <PolkadotCard isLoading={isLoading} />
-            </Grid>
-            <Grid item lg={4} md={6} sm={6} xs={12}>
-                <PolkadotCard isLoading={isLoading} />
-            </Grid> */}
-        </Grid>
+          <Grid container spacing={gridSpacing}>
+              <Grid item lg={4} md={6} sm={6} xs={12}>
+                  <PolkadotCard currentUser={currentUser} wallet={wallet}/>
+              </Grid>
+              {/* <Grid item lg={4} md={6} sm={6} xs={12}>
+                  <KusamaCard />
+              </Grid> */}
+              {/* <Grid item lg={4} md={6} sm={6} xs={12}>
+                  <PolkadotCard isLoading={isLoading} />
+              </Grid>
+              <Grid item lg={4} md={6} sm={6} xs={12}>
+                  <PolkadotCard isLoading={isLoading} />
+              </Grid> */}
+          </Grid>
     </Grid>
 
 </Grid>

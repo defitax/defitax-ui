@@ -1,5 +1,5 @@
 import React from 'react';
-import logo from '../logo.png';
+import logo from '../logo@2x.png';
 import {
   AppBar,
   Toolbar,
@@ -25,7 +25,7 @@ class Header extends React.Component {
      <Toolbar>
         <img src={logo} alt="logo" className={classes.logo} />
           <Typography variant="h6" color="inherit" noWrap>
-            TAXIFY
+            Defitax
           </Typography>
           <div className={classes.grow}/>
    

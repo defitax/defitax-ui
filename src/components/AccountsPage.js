@@ -116,50 +116,78 @@ export const client = new ApolloClient({
   link: ApolloLink.from([transLink]),
 });
 
- function TranscationDetailsPage({ currentUser, wallet ,selection}) {
-  const [daTable, setDaTable] = React.useState([]);
+ function AccountsPage({ currentUser, wallet, selection, onSelection }) {
+  // const [daTable, setDaTable] = React.useState([]);
   const [data, setData] = React.useState({});
-  const [dTable, setDTable] = React.useState([]);
-  const columns2 = [
-    { field: 'receiver_account_id', headerName: 'Receiver ID', width: 500},
-    { field: 'signer_account_id', headerName: 'Signer ID', width: 500 },
-    // { field: 'amount', headerName: 'AMOUNT', type: 'number',width: 300,valueFormatter: (params) => {
-    //   const valueFormatted = Number(params.value / Math.pow(10,10)).toLocaleString();
-    //   return `${valueFormatted}`;
-    // }, },
-  ];
-  const classes = useStyles();
-  const [pageModel, setPageModel] = React.useState(1);
-  const [error, setError] = useState(null);
+  const [daTable, setDaTable] = React.useState([]);
+  const [columnsTwo, setColumnsTwo] = React.useState([]);
+  // const [paginationModel, setPaginationModel] = React.useState({
+  //   page: 0,
+  // });
+  // const [allAccounts, setAllAccounts] = useState([]);
+  // const [error, setError] = useState(null);
+  // const [isLoading, setLoading] = useState(true);
   const [anchorEl, setAnchorEl] = React.useState(null);
-  const account = currentUser.accountId;
+  const [selectionS, setSelectionS] = useState([]);
+
+  // const selectionS = selection;
+  // const selectionS = selection;
+  // const setSelectionS = onSelection;
+  const classes = useStyles();
   var totalCount = 0;
+  const [pageModel, setPageModel] = React.useState(1);
+
+  const account = currentUser.accountId; 
+  const handleSubmit = () =>{
+    onSelection(selectionS);
+  }
+  const handleSelection = (e) =>{
+    setSelectionS(e);
+    // setSelection(e);
+  }
+  let columns = [
+    { field: 'id', headerName: 'TO ID',flex: 1 },
+  ];
   if(!account) 
   return (
     <div>
-    <span>No account found;  Connect via wallet</span>
+    <span>No account found; Either connect via wallet</span>
     <div></div>
     <Button variant="contained" endIcon={<SendIcon />} component={Link} to="/dashboard">
   Click to return to dashboard
 </Button></div>)
-  if(!selection.length) 
-  return (
-    <div>
-    <span>No account select; </span>
-    <div></div>
-    <Button variant="contained" endIcon={<SendIcon />} component={Link} to="/accounts">
-  Click to return to account
-</Button></div>)
-useEffect(() => {
+
+useEffect( () =>{
 
   var from = "sbv2-authority.testnet";
   var to = "switchboard-v2.testnet";
-  // fetch(`https://api-testnet.nearblocks.io/v1/txns?from=${from}&page=1&per_page=15&order=desc`,{
+   // {
+  //   "txns": [
+  //     {
+  //       "count": "97"
+  //     }
+  //   ]
+  // }
+     //  fetch(`https://api-testnet.nearblocks.io/v1/txns/count?from=${account}`,{
       // method: 'GET',
     // headers: {
     //   'Authorization': 'Bearer 5CF714ACEE2E410D9C1C593CE0E09C21'
     // }
-  // })
+  // }).then((response) => response.json())
+      // .then((data) => {
+        // totalCount = parseInt(data.txns[0].count , 10 );
+      // }).then(() =>{
+
+
+ 
+  // fetch(`https://api-testnet.nearblocks.io/v1/txns?from=${account}&page=0&per_page=15&order=desc`,{
+      // method: 'GET',
+    // headers: {
+    //   'Authorization': 'Bearer 5CF714ACEE2E410D9C1C593CE0E09C21'
+    // }
+  // })  
+// })
+
   const myHeaders = new Headers({
     "Content-Type": "application/json",
     Accept: "application/json"
@@ -170,37 +198,34 @@ useEffect(() => {
 
   })      .then((response) => response.json())
       .then((data) => {
+        //  console.log(data);
         //  setPosts(data);
         setData(data);
         const isSelected = (name) => selected.indexOf(name) !== -1;
 
   
-  // const dataTable = new Set();
+  const dataTable = new Set();
   // data.transfers.nodes.forEach(node => {
   //   dataTable.add({id: node.toId});
   // })
   // set unique to ids. 
-  // data.txns.forEach(node =>{
-  //   dataTable.add({id: node.receiver_account_id});
-  // })
-  setDaTable(data.txns);
+  data.txns.forEach(node =>{
+    dataTable.add( node.receiver_account_id);
+  })
   // dTable = dataTable;
-  // const array = [];
-  // dataTable.forEach(v => setDaTable(oldArray => [...oldArray, {id: v}]));
-    // dataTable.forEach(dt => {
-  //   dTable.push(dt);
+  const array = [];
+  dataTable.forEach(v => setDaTable(oldArray => [...oldArray, {id: v}]));
+  // setDaTable([...daTable,array]);
+  // console.log(daTable);
+  // dataTable.forEach(v => setDaTable([...daTable, {id: v}]))
+  // setDaTable(Array.from(dataTable));
+  // dataTable.forEach(dt => {
+  //   dTable.add(dt);
 
   // })
 
       });
-
-  // if (loading) return (
-  //   <div>
-  //   <span>Loading</span>
-  //   <div></div></div>);
-  // if (error) return `Error! ${error.message}`;
-},[]);
-
+}, [])
      
 // const handleClick = (event) => {
 //     setAnchorEl(event.currentTarget);
@@ -218,6 +243,7 @@ const handleClick = async (event) => {
   })
       .then((response) => response.json())
       .then((data) => {
+        //  console.log(data);
         //  setPosts(data);
         // setData(data);
         setDaTable(data.txns);
@@ -229,34 +255,63 @@ const handleClick = async (event) => {
   // setDaTable(data.transfers.nodes);
   // const daTable = data.transfers.nodes
 
+  const columns2 = [
+    { field: 'toId', headerName: 'TO ID', width: 500},
+    { field: 'fromId', headerName: 'FROM ID', width: 500 },
+    { field: 'amount', headerName: 'AMOUNT', type: 'number',width: 300,valueFormatter: (params) => {
+      const valueFormatted = Number(params.value / Math.pow(10,10)).toLocaleString();
+      return `${valueFormatted}`;
+    }, },
+  ];
+  setColumnsTwo(columns2);
+
 };
 const handlePageChange = (page)=>{
-  // setPageModel(page);
-  // fetch(`https://api-testnet.nearblocks.io/v1/txns?from=${account}&page=${page}&per_page=15&order=desc`,{
-    // method: 'GET',
-  // headers: {
-  //   'Authorization': 'Bearer 5CF714ACEE2E410D9C1C593CE0E09C21'
-  // }
-// })
+  setPageModel(page);
+   // fetch(`https://api-testnet.nearblocks.io/v1/txns?from=${account}&page=${page}&per_page=15&order=desc`,{
+      // method: 'GET',
+    // headers: {
+    //   'Authorization': 'Bearer 5CF714ACEE2E410D9C1C593CE0E09C21'
+    // }
+  // })
 
-const myHeaders = new Headers({
-  "Content-Type": "application/json",
-  Accept: "application/json"
-});
+  const myHeaders = new Headers({
+    "Content-Type": "application/json",
+    Accept: "application/json"
+  });
 
-fetch("http://localhost:3000/test.json", {
-  headers: myHeaders,
+  fetch("http://localhost:3000/test.json", {
+    headers: myHeaders,
 
-})      .then((response) => response.json())
-    .then((data) => {
-      //  console.log(data);
-      //  setPosts(data);
-      setData(data);
-      const isSelected = (name) => selected.indexOf(name) !== -1;
-      setDaTable(data.txns);
+  })      .then((response) => response.json())
+      .then((data) => {
+        //  console.log(data);
+        //  setPosts(data);
+        setData(data);
+        const isSelected = (name) => selected.indexOf(name) !== -1;
 
+  
+  const dataTable = new Set();
+  // data.transfers.nodes.forEach(node => {
+  //   dataTable.add({id: node.toId});
+  // })
+  // set unique to ids. 
+  data.txns.forEach(node =>{
+    dataTable.add( node.receiver_account_id);
+  })
+  // dTable = dataTable;
+  const array = [];
+  dataTable.forEach(v => setDaTable(oldArray => [...oldArray, {id: v}]));
+  // setDaTable([...daTable,array]);
+  // console.log(daTable);
+  // dataTable.forEach(v => setDaTable([...daTable, {id: v}]))
+  // setDaTable(Array.from(dataTable));
+  // dataTable.forEach(dt => {
+  //   dTable.add(dt);
 
-    });
+  // })
+
+      });
 }
 const handleSelect = (row) => {
   setSelected(row);
@@ -268,7 +323,7 @@ const handleClose = () => {
 function CustomToolbar() {
   return (
     <GridToolbarContainer>
-      <GridToolbarExport />
+      {/* <GridToolbarExport /> */}
     </GridToolbarContainer>
   );
 }
@@ -280,7 +335,7 @@ function createData(name, calories, fat, carbs, protein) {
   
   // dataTable['count']= dataTable.size;
   return (
-    <MainCard title="Transactions">
+    <MainCard title="Accounts">
          {/* <Grid container direction="column">
                         <Grid item>
                             <Grid container justifyContent="space-between">
@@ -320,33 +375,41 @@ function createData(name, calories, fat, carbs, protein) {
                         </Grid>
                         </Grid> */}
                         <div style={{ height: 550, width: '100%' }}>
-                         <DataGrid
+                          {/* { !daTable ?  */}
+                          <DataGrid
                               rows={daTable}
-                              columns={columns2}
+                              columns={columns}
                               pageSize={15}
                               rowsPerPageOptions={[15]}
+                              rowCount={totalCount}
+                              checkboxSelection
                               // autoPageSize
-                              // rowCount={totalCount}
-
-                              getRowId={(row) => row.transaction_hash}
+                              onSelectionModelChange={(newSelectionModel) => {
+                                handleSelection(newSelectionModel);
+                              }}
+                              selectionModel={selectionS}
                               onPageChange={(e)=> {handlePageChange(e)}}
-                              paginationMode="server"
+                              // paginationMode="server"
 
                               // page={pageModel}
-                              // checkboxSelection
-                              // onSelectionModelChange={(newSelectionModel) => {
-                              //   setSelection(newSelectionModel);
+                              // components={{
+                              //   Toolbar: CustomToolbar,
                               // }}
-                              // selectionModel={selection}
-                              components={{
-                                Toolbar: CustomToolbar,
-                              }}
                         /> 
-                         </div>
-                         <Button component={Link} to="/accounts" variant="contained" endIcon={<SendIcon />} 
-                        //  onClick={(event) => handleSubmit()}
-                         >
-  Back
+                        {/* : */}
+                        {/* <DataGrid
+                              rows={daTable}
+                              columns={columnsTwo}
+                              pageSize={20}
+                              rowsPerPageOptions={[20]}
+                              // components={{
+                              //   Toolbar: CustomToolbar,
+                              // }}
+                        /> */}
+                        {/* }  */}
+                        </div>
+                        <Button component={Link} to="/transaction/details" variant="contained" endIcon={<SendIcon />} onClick={(event) => handleSubmit()}>
+  Search
 </Button>
      {/* <TableContainer component={Paper}>
       <Table sx={{ minWidth: 650 }} aria-label="simple table">
@@ -388,8 +451,8 @@ function createData(name, calories, fat, carbs, protein) {
   );
 }
 
-TranscationDetailsPage.propTypes = {
+AccountsPage.propTypes = {
   classes: PropTypes.object.isRequired,
 };
 
-export default withStyles(useStyles)(TranscationDetailsPage);
+export default withStyles(useStyles)(AccountsPage);

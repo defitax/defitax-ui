@@ -1,12 +1,13 @@
 import { useSelector } from 'react-redux';
 import React, { useState,useEffect  } from 'react';
+import * as nearAPI from "near-api-js";
 
 import {web3Accounts, web3Enable} from "@polkadot/extension-dapp";
-
  
 // material-ui
 import { makeStyles, useTheme } from '@material-ui/styles';
 import {
+    Button,
     Avatar,
     Card,
     CardContent,
@@ -24,8 +25,10 @@ import {
     Switch,
     Typography
 } from '@material-ui/core';
+import { Link } from 'react-router-dom';
 
 // third-party
+import SendIcon from '@material-ui/icons/Send';
 
 // project imports
 import MainCard from '../../../../ui-component/cards/MainCard';
@@ -112,7 +115,7 @@ const useStyles = makeStyles((theme) => ({
 
 // ===========================|| PROFILE MENU ||=========================== //
 
-const ProfileSection = ({return_data}) => {
+const ProfileSection = ({return_data,currentUser, nearConfig, wallet}) => {
     const AccountsContext = React.createContext('account')
    
     const classes = useStyles();
@@ -126,40 +129,97 @@ const ProfileSection = ({return_data}) => {
 
     const [open, setOpen] = React.useState(false);
     const anchorRef = React.useRef(null);
-    const handleLogout = async () => {
-        console.error('Logout');
-    };
 
+    // const { connect, keyStores, WalletConnection } = nearAPI;
+
+    // const [walletConnection, setWalletConnection] = useState({});
     const [allAccounts, setAllAccounts] = useState([]);
     const [error, setError] = useState(null);
     const [isLoading, setLoading] = useState(true);
     const [anchorEl, setAnchorEl] = React.useState(null);
-  
+//     if(!currentUser || !currentUser.accountId) 
+//     return (
+//       <div>
+//       <span>No account found;  Connect via wallet</span>
+//       <div></div>
+//       <Button variant="contained" endIcon={<SendIcon />} component={Link} to="/dashboard">
+//     Click to return to dashboard
+//   </Button></div>)
       useEffect(() => {
+         allAccounts.push(currentUser?.accountId);
           setLoading(false);
       }, []);
-  
-      const extensionSetup = async () => {
-        const allInjected = await web3Enable('Wallet-connect-tutorial');
-        if (allInjected.length === 0) {
-            setError('No extension installed!');
-            return;
+      const signOutHere = () => {
+        wallet.signOut();
+            window.location.replace(
+              window.location.origin + window.location.pathname
+            );
         }
+        const signIn = () => {
+            wallet.requestSignIn("", "");
+            }
+      const handleUser = (e) => {
+        handleToggle();
+        if (currentUser && e.target.textContent === "Sign Out") {
+            signOutHere();
+        } else if (!currentUser && e.target.textContent === "Connect to wallet") {
+            signIn();
+        }
+      };
+      const handleToggle = () => {
+            setOpen((prevOpen) => !prevOpen);
+        };
+    //   const extensionSetup = async () => {
+    //     const allInjected = await web3Enable('Wallet-connect-tutorial');
+    //     if (allInjected.length === 0) {
+    //         setError('No extension installed!');
+    //         return;
+    //     }
     
-        const allAccounts = await web3Accounts();
-      setAllAccounts(allAccounts);
-      return_data(allAccounts);
-    };
-    const handleToggle = () => {
-        setOpen((prevOpen) => !prevOpen);
-    };
-  const connectToWallet = () => {
-    handleToggle();
-      console.log("connecting to wallet");
-      extensionSetup();
-    console.log("connected");
+    //     const allAccounts = await web3Accounts();
+    //   const nearConnection = await nearAPI.connect(connectionConfig);
+    //   const w = new nearAPI.WalletConnection(nearConnection,"");
+    //   setWalletConnection(w);
+    //   w.requestSignIn({
+    //     // contractId: "fd1aeeff566bcca0115a102132dc679a1a4b37eba77445f10200e916edb48c16",
+    //     // methodNames: [], // optional
+    //     // successUrl: "REPLACE_ME://.com/success", // optional redirect URL on success
+    //     // failureUrl: "REPLACE_ME://.com/failure" // optional redirect URL on failure
+    //   });
+    //   const walletAccountObj = w.account();
+    //   console.log("walletAccountObj");
 
-  }
+    //   console.log(walletAccountObj);
+
+    //   setAllAccounts(allAccounts);
+    //   return_data(allAccounts);
+    // };
+    // const handleToggle = () => {
+    //     setOpen((prevOpen) => !prevOpen);
+    // };
+    // average black flag rather eight wear bamboo truly tube dilemma royal primary
+    // creates keyStore using private key in local storage
+
+// const myKeyStore = new keyStores.BrowserLocalStorageKeyStore();
+// const connectionConfig = {
+//     networkId: "testnet",
+//     keyStore: myKeyStore, // first create a key store 
+//     nodeUrl: "https://rpc.testnet.near.org",
+//     walletUrl: "https://wallet.testnet.near.org",
+//     helperUrl: "https://helper.testnet.near.org",
+//     explorerUrl: "https://explorer.testnet.near.org",
+//   };
+  
+//   const signOut = () => {
+//     walletConnection.signOut();
+//   }
+//   const connectToWallet = () => {
+//     handleToggle();
+//       console.log("connecting to wallet");
+//       extensionSetup();
+//     console.log("connected");
+
+//   }
 
    
     const handleClose = (event) => {
@@ -193,14 +253,15 @@ const ProfileSection = ({return_data}) => {
                 //     >Connect to wallet </Avatar>
                 // }
                 // label={<IconSettings stroke={1.5} size="1.5rem" color={theme.palette.primary.main} />}
-                label={allAccounts.length > 0 ? "Show account"  : "Connect to wallet"}
+                label={currentUser  ? "Show account"  : "Connect to wallet"}
                 variant="outlined"
                 ref={anchorRef}
                 aria-controls={open ? 'menu-list-grow' : undefined}
                 aria-haspopup="true"
-                onClick={connectToWallet}
+                onClick={handleUser}
                 color="primary"
             />
+         
             <Popper
                 placement="bottom-end"
                 open={open}
@@ -230,11 +291,33 @@ const ProfileSection = ({return_data}) => {
                                                 <Typography variant="subtitle2">Address:</Typography>
                                                 <Typography component="span" variant="h4" className={classes.name}>
                                                      {
-                                                        allAccounts.map(account => <div style={{ marginTop: 10}}>{account.address}</div>)
+                                                        allAccounts.map(account => <div style={{ marginTop: 10}}>{account}</div>)
                                                     }
                                                 </Typography>
+                                               
                                             </Grid>
                                         </Grid>
+                                        <Chip
+                                                classes={{ label: classes.profileLabel }}
+                                                className={classes.profileChip}
+                                                // icon={
+                                                //     <Avatar
+                                                //         className={classes.headerAvatar}
+                                                //         ref={anchorRef}
+                                                //         aria-controls={open ? 'menu-list-grow' : undefined}
+                                                //         aria-haspopup="true"
+                                                //         color="inherit" 
+                                                //     >Connect to wallet </Avatar>
+                                                // }
+                                                // label={<IconSettings stroke={1.5} size="1.5rem" color={theme.palette.primary.main} />}
+                                                label={currentUser  ? "Sign Out"  : "Sign Out"}
+                                                variant="outlined"
+                                                ref={anchorRef}
+                                                aria-controls={open ? 'menu-list-grow' : undefined}
+                                                aria-haspopup="true"
+                                                onClick={signOutHere}
+                                                color="primary"
+                                            />
                                     </CardContent>
                                 </MainCard>
                             </ClickAwayListener>

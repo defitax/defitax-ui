@@ -15,7 +15,7 @@ import NavigationScroll from '../layout/NavigationScroll';
 
 // ===========================|| APP ||=========================== //
 
-const App = () => {
+const App = ({ currentUser, nearConfig, wallet }) => {
     const customization = useSelector((state) => state.customization);
 
     return (
@@ -23,7 +23,7 @@ const App = () => {
             <ThemeProvider theme={themes(customization)}>
                 <CssBaseline />
                 <NavigationScroll>
-                    <Routes />
+                    <Routes currentUser={currentUser} nearConfig={nearConfig} wallet={wallet}/>
                 </NavigationScroll>
             </ThemeProvider>
         </StyledEngineProvider>

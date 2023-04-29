@@ -5,8 +5,9 @@ import MainLayout from '../layout/MainLayout';
 import Loadable from '../ui-component/Loadable';
 
 // dashboard routing
-const DashboardDefault = Loadable(lazy(() => import('../Dashboard')));
-const TranscationDetailsPage = Loadable(lazy(() => import('../TranscationDetailsPage')));
+const Dashboard = Loadable(lazy(() => import('../Dashboard')));
+const AccountsPage = Loadable(lazy(() => import('../AccountsPage')));
+const TransactionDetailsPage = Loadable(lazy(() => import('../TranscationDetailsPage')));
 
 // // utilities routing
 // const UtilsTypography = Loadable(lazy(() => import('views/utilities/Typography')));
@@ -19,28 +20,34 @@ const TranscationDetailsPage = Loadable(lazy(() => import('../TranscationDetails
 // const SamplePage = Loadable(lazy(() => import('views/sample-page')));
 
 // ===========================|| MAIN ROUTING ||=========================== //
+const MainRoutes = (currentUser, nearConfig, wallet ) => {
+    const [selection, setSelection] = React.useState([]);
 
-const MainRoutes = {
+    return ({
     path: '/',
-    element: <MainLayout />,
+    element: <MainLayout currentUser={currentUser} nearConfig={nearConfig} wallet={wallet} />,
     children: [
         {
             path: '/',
-            element: <DashboardDefault />
+            element: <Dashboard currentUser={currentUser} wallet={wallet} />
         },
         {
             path: '/dashboard',
-            element: <DashboardDefault />
+            element: <Dashboard currentUser={currentUser} wallet={wallet} />
         },
         {
             path: '/dashboard/default',
-            element: <DashboardDefault />
+            element: <Dashboard currentUser={currentUser} wallet={wallet} />
+        },
+        {
+            path: '/accounts',
+            element: <AccountsPage currentUser={currentUser} nearConfig={nearConfig} wallet={wallet} selection={selection} onSelection={setSelection} />
         },
         {
             path: '/transaction/details',
-            element: <TranscationDetailsPage />
+            element: <TransactionDetailsPage currentUser={currentUser} nearConfig={nearConfig} wallet={wallet} selection={selection} />
         }
     ]
-};
+})}; 
 
 export default MainRoutes;

@@ -78,7 +78,7 @@ const useStyles = makeStyles((theme) => ({
 
 // ===========================|| MAIN LAYOUT ||=========================== //
 
-const MainLayout = () => {
+const MainLayout = ({ currentUser, nearConfig, wallet }) => {
     const classes = useStyles();
     const theme = useTheme();
     const matchDownMd = useMediaQuery(theme.breakpoints.down('md'));
@@ -123,7 +123,7 @@ const MainLayout = () => {
                 className={leftDrawerOpened ? classes.appBarWidth : classes.appBar}
             >
                 <Toolbar>
-                    <Header return_dataProp={return_data} handleLeftDrawerToggle={handleLeftDrawerToggle} />
+                    <Header handleLeftDrawerToggle={handleLeftDrawerToggle} return_dataProp={return_data} currentUser={currentUser} nearConfig={nearConfig} wallet={wallet} />
                 </Toolbar>
             </AppBar>
 
@@ -145,7 +145,7 @@ const MainLayout = () => {
                     <AppContext.Provider value={account}>
 
                      <Outlet />
-                </AppContext.Provider>;
+                </AppContext.Provider>
 
                      </ApolloProvider>
 

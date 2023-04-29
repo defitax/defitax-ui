@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { withStyles } from '@material-ui/styles';
 import Typography from '@material-ui/core/Typography';
 import SearchIcon from '@material-ui/icons/Search';
-import logo from './logo-home-page.png';
+import logo from './logo@2x.png';
 import {
   InputBase,
 } from '@material-ui/core';
