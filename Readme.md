@@ -1,0 +1,1 @@
+Run ```npm run deploy``` to deploy a bundled package to gh-page branch 

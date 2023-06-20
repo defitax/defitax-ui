@@ -44,7 +44,9 @@
         "start": "react-scripts start",
         "build": "react-scripts build",
         "test": "react-scripts test",
-        "eject": "react-scripts eject"
+        "eject": "react-scripts eject",
+        "predeploy": "npm run build",
+        "deploy": "gh-pages -d build"
     },
     "eslintConfig": {
         "extends": [
@@ -79,6 +81,7 @@
         "eslint-plugin-prettier": "^3.4.0",
         "eslint-plugin-react": "7.21.5",
         "eslint-plugin-react-hooks": "^4.2.0",
+        "gh-pages": "^5.0.0",
         "prettier": "^2.2.1",
         "sass": "^1.32.11"
     }
