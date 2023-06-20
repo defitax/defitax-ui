@@ -2,6 +2,7 @@
     "name": "tax-defi",
     "version": "2.0.0",
     "private": true,
+    "homepage": "https://defitax.github.io/defitax-ui/",
     "dependencies": {
         "@apollo/client": "^3.4.16",
         "@emotion/cache": "^11.4.0",
