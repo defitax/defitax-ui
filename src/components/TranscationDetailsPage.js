@@ -120,6 +120,12 @@ export const client = new ApolloClient({
   const [daTable, setDaTable] = React.useState([]);
   const [data, setData] = React.useState({});
   const [dTable, setDTable] = React.useState([]);
+  const [isLoading, setLoading] = React.useState(true);
+  const [pageSize, setPageSize] = React.useState(10);
+  const [paginationModel, setPaginationModel] = React.useState({
+    pageSize: 25,
+    page: 0,
+  });
   const columns2 = [
     { field: 'receiver_account_id', headerName: 'Receiver ID', width: 500},
     { field: 'signer_account_id', headerName: 'Signer ID', width: 500 },
@@ -150,28 +156,49 @@ export const client = new ApolloClient({
     <Button variant="contained" endIcon={<SendIcon />} component={Link} to="/accounts">
   Click to return to account
 </Button></div>)
-useEffect(() => {
+useEffect( async () => {
+  setLoading(true)
 
   var from = "sbv2-authority.testnet";
   var to = "switchboard-v2.testnet";
+  // selection
+  Promise.all(
+  selection.map( account => fetch(`https://api-testnet.nearblocks.io/v1/txns/count?from=${account}`,{
+    method: 'GET',
+  headers: {
+    'Authorization': 'Bearer 5CF714ACEE2E410D9C1C593CE0E09C21'
+  }}))
+  ).then(responses => Promise.all(responses.map(response => response.json())))
+      .then((data) => {
+        console.log(data)
+        totalCount = data.reduce((sum, el) => sum += parseInt(el.txns[0].count), 0);
+        // totalCount = parseInt(data.txns[0].count , 10 );
+      }).then( () =>{
+         Promise.all(
+        selection.map( account => fetch(`https://api-testnet.nearblocks.io/v1/txns?from=${account}&page=1&per_page=5&order=desc`,{
+          method: 'GET',
+        headers: {
+          'Authorization': 'Bearer 5CF714ACEE2E410D9C1C593CE0E09C21'
+        }}))
+        ).then(responses => Promise.all(responses.map(response => response.json())))
   // fetch(`https://api-testnet.nearblocks.io/v1/txns?from=${from}&page=1&per_page=15&order=desc`,{
-      // method: 'GET',
-    // headers: {
-    //   'Authorization': 'Bearer 5CF714ACEE2E410D9C1C593CE0E09C21'
-    // }
+  //     method: 'GET',
+  //   headers: {
+  //     'Authorization': 'Bearer 5CF714ACEE2E410D9C1C593CE0E09C21'
+  //   }
   // })
-  const myHeaders = new Headers({
-    "Content-Type": "application/json",
-    Accept: "application/json"
-  });
+  // const myHeaders = new Headers({
+  //   "Content-Type": "application/json",
+  //   Accept: "application/json"
+  // });
 
-  fetch("http://localhost:3000/test.json", {
-    headers: myHeaders,
+  // fetch("http://localhost:3000/test.json", {
+  //   headers: myHeaders,
 
-  })      .then((response) => response.json())
+  // })      .then((response) => response.json())
       .then((data) => {
         //  setPosts(data);
-        setData(data);
+        // setData(data);
         const isSelected = (name) => selected.indexOf(name) !== -1;
 
   
@@ -183,16 +210,23 @@ useEffect(() => {
   // data.txns.forEach(node =>{
   //   dataTable.add({id: node.receiver_account_id});
   // })
-  setDaTable(data.txns);
+  var te = data.flatMap(s => s.txns)
+  setDaTable(te);
+  setPageSize(te.length)
+  console.log(te)
+  console.log(daTable)
+
   // dTable = dataTable;
   // const array = [];
   // dataTable.forEach(v => setDaTable(oldArray => [...oldArray, {id: v}]));
     // dataTable.forEach(dt => {
   //   dTable.push(dt);
+  setLoading(false)
 
   // })
 
-      });
+      })
+    });
 
   // if (loading) return (
   //   <div>
@@ -230,34 +264,39 @@ const handleClick = async (event) => {
   // const daTable = data.transfers.nodes
 
 };
-const handlePageChange = (page)=>{
+const handlePageChange = async (page)=>{
+  setLoading(true)
+
   // setPageModel(page);
-  // fetch(`https://api-testnet.nearblocks.io/v1/txns?from=${account}&page=${page}&per_page=15&order=desc`,{
-    // method: 'GET',
-  // headers: {
-  //   'Authorization': 'Bearer 5CF714ACEE2E410D9C1C593CE0E09C21'
-  // }
+  await Promise.all(
+    selection.map( account => fetch(`https://api-testnet.nearblocks.io/v1/txnsfrom=${account}&page=${page}&per_page=5&order=desc`,{
+      method: 'GET',
+    headers: {
+      'Authorization': 'Bearer 5CF714ACEE2E410D9C1C593CE0E09C21'
+    }}).then((response) => response.json()))
+    )
 // })
+// 
+// const myHeaders = new Headers({
+//   "Content-Type": "application/json",
+//   Accept: "application/json"
+// });
 
-const myHeaders = new Headers({
-  "Content-Type": "application/json",
-  Accept: "application/json"
-});
-
-fetch("http://localhost:3000/test.json", {
-  headers: myHeaders,
-
-})      .then((response) => response.json())
+// fetch("http://localhost:3000/test.json", {
+//   headers: myHeaders,
+// .then((response) => response.json())
     .then((data) => {
       //  console.log(data);
       //  setPosts(data);
-      setData(data);
+      // setData(data);
       const isSelected = (name) => selected.indexOf(name) !== -1;
-      setDaTable(data.txns);
+      setDaTable(data.flatMap(s => s.txns));
+      setPageSize(daTable.length)
+      setLoading(false)
 
 
     });
-}
+};
 const handleSelect = (row) => {
   setSelected(row);
 };
@@ -323,12 +362,15 @@ function createData(name, calories, fat, carbs, protein) {
                          <DataGrid
                               rows={daTable}
                               columns={columns2}
-                              pageSize={15}
-                              rowsPerPageOptions={[15]}
+                              pageSize={pageSize}
+                              rowsPerPageOptions={pageSize}
                               // autoPageSize
                               // rowCount={totalCount}
+                              loading={isLoading}
 
                               getRowId={(row) => row.transaction_hash}
+                              // paginationModel={paginationModel}
+                              // onPaginationModelChange={setPaginationModel}
                               onPageChange={(e)=> {handlePageChange(e)}}
                               paginationMode="server"
 

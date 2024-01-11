@@ -128,6 +128,7 @@ export const client = new ApolloClient({
   // const [error, setError] = useState(null);
   // const [isLoading, setLoading] = useState(true);
   const [anchorEl, setAnchorEl] = React.useState(null);
+  const [isLoading, setLoading] = React.useState(true);
   const [selectionS, setSelectionS] = useState([]);
 
   // const selectionS = selection;
@@ -168,37 +169,37 @@ useEffect( () =>{
   //     }
   //   ]
   // }
-     //  fetch(`https://api-testnet.nearblocks.io/v1/txns/count?from=${account}`,{
-      // method: 'GET',
-    // headers: {
-    //   'Authorization': 'Bearer 5CF714ACEE2E410D9C1C593CE0E09C21'
-    // }
-  // }).then((response) => response.json())
-      // .then((data) => {
-        // totalCount = parseInt(data.txns[0].count , 10 );
-      // }).then(() =>{
+  setLoading(true)
+      fetch(`https://api-testnet.nearblocks.io/v1/txns/count?from=${account}`,{
+      method: 'GET',
+    headers: {
+      'Authorization': 'Bearer 5CF714ACEE2E410D9C1C593CE0E09C21'
+    }
+  }).then((response) => response.json())
+      .then((data) => {
+        console.log(data)
+        totalCount = parseInt(data.txns[0].count , 10 );
+      }).then(() =>{
 
-
- 
-  // fetch(`https://api-testnet.nearblocks.io/v1/txns?from=${account}&page=0&per_page=15&order=desc`,{
-      // method: 'GET',
-    // headers: {
-    //   'Authorization': 'Bearer 5CF714ACEE2E410D9C1C593CE0E09C21'
-    // }
+  fetch(`https://api-testnet.nearblocks.io/v1/txns?from=${account}&page=1&per_page=15&order=desc`,{
+      method: 'GET',
+    headers: {
+      'Authorization': 'Bearer 5CF714ACEE2E410D9C1C593CE0E09C21',
+    }
   // })  
 // })
+// 
+  // const myHeaders = new Headers({
+  //   "Content-Type": "application/json",
+  //   Accept: "application/json"
+  // });
 
-  const myHeaders = new Headers({
-    "Content-Type": "application/json",
-    Accept: "application/json"
-  });
+  // fetch("http://localhost:3000/test.json", {
+  //   headers: myHeaders,
 
-  fetch("http://localhost:3000/test.json", {
-    headers: myHeaders,
-
-  })      .then((response) => response.json())
+  }).then((response) =>  response.json())
       .then((data) => {
-        //  console.log(data);
+
         //  setPosts(data);
         setData(data);
         const isSelected = (name) => selected.indexOf(name) !== -1;
@@ -221,8 +222,9 @@ useEffect( () =>{
   // setDaTable(Array.from(dataTable));
   // dataTable.forEach(dt => {
   //   dTable.add(dt);
+  setLoading(false)
 
-  // })
+  })
 
       });
 }, [])
@@ -241,7 +243,7 @@ const handleClick = async (event) => {
       'Authorization': 'Bearer 5CF714ACEE2E410D9C1C593CE0E09C21'
     }
   })
-      .then((response) => response.json())
+      // .then((response) => response.json())
       .then((data) => {
         //  console.log(data);
         //  setPosts(data);
@@ -267,21 +269,23 @@ const handleClick = async (event) => {
 
 };
 const handlePageChange = (page)=>{
+  setLoading(true)
+
   setPageModel(page);
-   // fetch(`https://api-testnet.nearblocks.io/v1/txns?from=${account}&page=${page}&per_page=15&order=desc`,{
-      // method: 'GET',
-    // headers: {
-    //   'Authorization': 'Bearer 5CF714ACEE2E410D9C1C593CE0E09C21'
-    // }
+   fetch(`https://api-testnet.nearblocks.io/v1/txns?from=${account}&page=${page}&per_page=15&order=desc`,{
+      method: 'GET',
+    headers: {
+      'Authorization': 'Bearer 5CF714ACEE2E410D9C1C593CE0E09C21'
+    }
   // })
 
-  const myHeaders = new Headers({
-    "Content-Type": "application/json",
-    Accept: "application/json"
-  });
+  // const myHeaders = new Headers({
+  //   "Content-Type": "application/json",
+  //   Accept: "application/json"
+  // });
 
-  fetch("http://localhost:3000/test.json", {
-    headers: myHeaders,
+  // fetch("http://localhost:3000/test.json", {
+  //   headers: myHeaders,
 
   })      .then((response) => response.json())
       .then((data) => {
@@ -310,6 +314,7 @@ const handlePageChange = (page)=>{
   //   dTable.add(dt);
 
   // })
+  setLoading(false)
 
       });
 }
@@ -381,23 +386,24 @@ function createData(name, calories, fat, carbs, protein) {
                               columns={columns}
                               pageSize={15}
                               rowsPerPageOptions={[15]}
-                              rowCount={totalCount}
+                              // rowCount={totalCount}
                               checkboxSelection
+                              loading={isLoading}
                               // autoPageSize
                               onSelectionModelChange={(newSelectionModel) => {
                                 handleSelection(newSelectionModel);
                               }}
                               selectionModel={selectionS}
                               onPageChange={(e)=> {handlePageChange(e)}}
-                              // paginationMode="server"
+                              paginationMode="server"
 
                               // page={pageModel}
                               // components={{
                               //   Toolbar: CustomToolbar,
                               // }}
                         /> 
-                        {/* : */}
-                        {/* <DataGrid
+                         {/* : 
+                         <DataGrid
                               rows={daTable}
                               columns={columnsTwo}
                               pageSize={20}
@@ -405,8 +411,8 @@ function createData(name, calories, fat, carbs, protein) {
                               // components={{
                               //   Toolbar: CustomToolbar,
                               // }}
-                        /> */}
-                        {/* }  */}
+                        /> 
+                         }  */}
                         </div>
                         <Button component={Link} to="/transaction/details" variant="contained" endIcon={<SendIcon />} onClick={(event) => handleSubmit()}>
   Search
