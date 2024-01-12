@@ -213,8 +213,7 @@ useEffect( async () => {
   var te = data.flatMap(s => s.txns)
   setDaTable(te);
   setPageSize(te.length)
-  console.log(te)
-  console.log(daTable)
+  
 
   // dTable = dataTable;
   // const array = [];
@@ -273,8 +272,8 @@ const handlePageChange = async (page)=>{
       method: 'GET',
     headers: {
       'Authorization': 'Bearer 5CF714ACEE2E410D9C1C593CE0E09C21'
-    }}).then((response) => response.json()))
-    )
+    }}))
+    ).then(responses => Promise.all(responses.map(response => response.json())))
 // })
 // 
 // const myHeaders = new Headers({
@@ -363,7 +362,7 @@ function createData(name, calories, fat, carbs, protein) {
                               rows={daTable}
                               columns={columns2}
                               pageSize={pageSize}
-                              rowsPerPageOptions={pageSize}
+                              // rowsPerPageOptions={pageSize}
                               // autoPageSize
                               // rowCount={totalCount}
                               loading={isLoading}
